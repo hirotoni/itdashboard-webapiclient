@@ -1,0 +1,1 @@
+{"version":3,"file":"AxiosClient.js","sourceRoot":"","sources":["../../src/http/AxiosClient.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;AAAA,kDAA6C;AAE7C,MAAa,WAAW;IACtB,gBAAe,CAAC;IAEV,GAAG,CAAC,IAAY,EAAE,MAAe;;YACrC,MAAM,QAAQ,GAAG,MAAM,eAAK,CAAC,GAAG,CAAC,IAAI,CAAC,CAAC;YACvC,OAAO,QAAQ,CAAC,IAAI,CAAC;QACvB,CAAC;KAAA;CACF;AAPD,kCAOC"}
