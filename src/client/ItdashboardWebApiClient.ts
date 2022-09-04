@@ -27,7 +27,11 @@ export class ItdashboardWebApiClient {
     this.httpClient = httpClient;
   }
 
-  async get<Key extends keyof Datasets>(dataset: Key, filterByFields?: Datasets[Key], options?: Options) {
+  async get<Key extends keyof Datasets>(
+    dataset: Key,
+    filterByFields?: Datasets[Key],
+    options?: Options
+  ): Promise<ApiResponse<Datasets[Key]>> {
     const queryParamsString = this.pathBuilder({ dataset, ...filterByFields, ...options });
     const path = this.baseUrl + "?" + queryParamsString;
     const data = await this.httpClient.get(path);
