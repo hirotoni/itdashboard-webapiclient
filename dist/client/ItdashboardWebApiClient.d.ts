@@ -19,6 +19,6 @@ export declare class ItdashboardWebApiClient {
     private baseUrl;
     private httpClient;
     constructor(httpClient?: DefaultHttpClient, baseUrl?: string);
-    get<Key extends keyof Datasets>(dataset: Key, filterByFields?: Datasets[Key], options?: Options): Promise<any>;
+    get<Key extends keyof Datasets>(dataset: Key, filterByFields?: Datasets[Key], options?: Options): Promise<ApiResponse<Datasets[Key]>>;
     private pathBuilder;
 }
