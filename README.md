@@ -1,4 +1,10 @@
+# description
+
+web api client module for the site below
+
+https://cio.go.jp/itdashboard/webapi
+
 # Features in list
 
 - basic web api client
-- local cache in order to lower the frequent requests
+- local cache to lower frequent requests
