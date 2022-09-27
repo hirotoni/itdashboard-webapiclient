@@ -74,9 +74,19 @@ describe("Axios Http Client", () => {
   });
 
   describe("OdDataset", () => {
-    test("should get something", async () => {
-      const result = await client.get("OdDataset");
-      expect(result.raw_data).toBeTruthy();
+    test("should get from cache", async () => {
+      const expirationTime = 10000;
+
+      const resultToBeCached = await client.get("OdDataset", {}, expirationTime);
+      expect(resultToBeCached.raw_data).toBeTruthy();
+
+      const resultFromCache = await client.get("OdDataset");
+      expect(resultFromCache.takenFromCache).toBe(true);
+
+      setTimeout(async () => {
+        const resultFromFresh = await client.get("OdDataset");
+        expect(resultFromFresh.takenFromCache).toBe(undefined);
+      }, expirationTime);
     });
   });
 });
