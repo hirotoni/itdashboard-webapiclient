@@ -6,6 +6,7 @@ export declare type ApiResponse<T> = {
         dataset: string;
     };
     raw_data: T[];
+    takenFromCache?: boolean;
 };
 export interface Datasets {
     BasicInformationAll: Partial<BasicInformationAllModel>;
@@ -22,7 +23,8 @@ export declare type Options<Key extends keyof Datasets> = {
 export declare class ItdashboardWebApiClient {
     private baseUrl;
     private httpClient;
+    private urlCache;
     constructor(httpClient?: DefaultHttpClient, baseUrl?: string);
-    get<Key extends keyof Datasets>(dataset: Key, options?: Options<Key>): Promise<ApiResponse<Datasets[Key]>>;
+    get<Key extends keyof Datasets>(dataset: Key, options?: Options<Key>, cacheExpirationTime?: number): Promise<ApiResponse<Datasets[Key]>>;
     private buildQueryString;
 }
