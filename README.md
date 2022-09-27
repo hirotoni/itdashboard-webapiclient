@@ -79,10 +79,26 @@ Unchecked ones are to be implemented in the near future.
 import { ApiResponse, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
 import { BasicInformationAllModel } from "itdashboard-webapiclient/dist/client/models";
 
+// initialization
 const client = new ItdashboardWebApiClient();
 let resData: ApiResponse<BasicInformationAllModel>;
 
-client.get("BasicInformationAll").then((d) => {
-  resData = d;
-});
+// options
+const fieldsToGet: (keyof Datasets["BasicInformation"])[] = ["organization", "year"];
+const filterByFields = { year: 2013 };
+const cacheExpirationTime = 60000;
+
+// api call
+client
+  .get(
+    "BasicInformation",
+    {
+      fieldsToGet: fieldsToGet,
+      filterByFields: filterByFields,
+    },
+    cacheExpirationTime
+  )
+  .then((d) => {
+    resData = d;
+  });
 ```
