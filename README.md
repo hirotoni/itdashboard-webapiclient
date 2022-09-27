@@ -31,7 +31,7 @@ Unchecked ones are to be implemented in the near future.
 
 オープンデータ
 
-- [ ] OdDataset
+- [x] OdDataset
 - [ ] ResourceTotal
 - [ ] DataFormatTotal
 - [ ] LanguageTotal
@@ -62,7 +62,7 @@ Unchecked ones are to be implemented in the near future.
 # Features in the bucket list
 
 - Implement the interfaces of the above unchecked datasets.
-- Configurable client-side local cache to avoid frequent requests
+- Configurable client-side cache to avoid frequent requests
 
 # Installation
 
@@ -79,8 +79,9 @@ Unchecked ones are to be implemented in the near future.
 import { ApiResponse, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
 import { BasicInformationAllModel } from "itdashboard-webapiclient/dist/client/models";
 
-let resData: ApiResponse<BasicInformationAllModel>;
 const client = new ItdashboardWebApiClient();
+let resData: ApiResponse<BasicInformationAllModel>;
+
 client.get("BasicInformationAll").then((d) => {
   resData = d;
 });
