@@ -77,11 +77,11 @@ Unchecked ones are to be implemented in the near future.
 
 ```typescript
 import { ApiResponse, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
-import { BasicInformationAllModel } from "itdashboard-webapiclient/dist/client/models";
+import { BasicInformationModel } from "itdashboard-webapiclient/dist/client/models";
 
 // initialization
 const client = new ItdashboardWebApiClient();
-let resData: ApiResponse<BasicInformationAllModel>;
+let resData: ApiResponse<BasicInformationModel>;
 
 // options
 const fieldsToGet: (keyof Datasets["BasicInformation"])[] = ["organization", "year"];
