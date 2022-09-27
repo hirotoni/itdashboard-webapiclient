@@ -1,4 +1,4 @@
-export class FetchClient {
+export class FetchHttpClient {
   constructor() {}
 
   async get(path: string, params?: object) {

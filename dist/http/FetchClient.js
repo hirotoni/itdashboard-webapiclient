@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FetchClient = void 0;
-class FetchClient {
+exports.FetchHttpClient = void 0;
+class FetchHttpClient {
     constructor() { }
     get(path, params) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -20,5 +20,5 @@ class FetchClient {
         });
     }
 }
-exports.FetchClient = FetchClient;
+exports.FetchHttpClient = FetchHttpClient;
 //# sourceMappingURL=FetchClient.js.map

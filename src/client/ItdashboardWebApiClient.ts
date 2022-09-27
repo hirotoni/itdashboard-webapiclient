@@ -1,5 +1,5 @@
-import { AxiosClient as DefaultHttpClient } from "../http/AxiosClient";
-import { BasicInformationAllModel, BasicInformationModel, BudgetModel } from "./models";
+import { AxiosHttpClient as DefaultHttpClient } from "../http/AxiosClient";
+import { BasicInformationAllModel, BasicInformationModel, BudgetModel, OdDataset, OdGroup } from "./models";
 
 const BASEURL = "https://itdashboard.cio.go.jp/PublicApi/getData.json";
 
@@ -12,9 +12,13 @@ export interface Datasets {
   BasicInformationAll: Partial<BasicInformationAllModel>;
   BasicInformation: Partial<BasicInformationModel>;
   Budget: Partial<BudgetModel>;
+  OdGroup: Partial<OdGroup>;
+  OdDataset: Partial<OdDataset>;
 }
 
-export type Options = {
+export type Options<Key extends keyof Datasets> = {
+  fieldsToGet?: (keyof Datasets[Key])[];
+  filterByFields?: Datasets[Key];
   option?: "count";
 };
 
@@ -27,19 +31,33 @@ export class ItdashboardWebApiClient {
     this.httpClient = httpClient;
   }
 
-  async get<Key extends keyof Datasets>(
-    dataset: Key,
-    filterByFields?: Datasets[Key],
-    options?: Options
-  ): Promise<ApiResponse<Datasets[Key]>> {
-    const queryParamsString = this.pathBuilder({ dataset, ...filterByFields, ...options });
+  async get<Key extends keyof Datasets>(dataset: Key, options?: Options<Key>): Promise<ApiResponse<Datasets[Key]>> {
+    const queryParamsString = this.buildQueryString(dataset, options);
+
     const path = this.baseUrl + "?" + queryParamsString;
     const data = await this.httpClient.get(path);
     return data;
   }
 
-  private pathBuilder(queryParams: {}) {
-    const obj = new URLSearchParams(queryParams);
+  private buildQueryString<Key extends keyof Datasets>(dataset: Key, options?: Options<Key>) {
+    const queryObject = {
+      dataset: dataset,
+    };
+
+    if (options?.fieldsToGet) {
+      const fieldsToGet = options.fieldsToGet?.join(",");
+      Object.assign(queryObject, {
+        field: fieldsToGet,
+      });
+    }
+
+    if (options?.filterByFields) {
+      Object.assign(queryObject, {
+        ...options.filterByFields,
+      });
+    }
+
+    const obj = new URLSearchParams(queryObject);
     return obj.toString();
   }
 }

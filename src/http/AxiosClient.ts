@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 
-export class AxiosClient {
+export class AxiosHttpClient {
   constructor() {}
 
   async get(path: string, params?: object) {
