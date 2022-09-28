@@ -1,6 +1,7 @@
-import { AxiosHttpClient as DefaultHttpClient } from "../http/AxiosClient";
+import { AxiosHttpClient, AxiosHttpClient as DefaultHttpClient } from "../http/AxiosClient";
 import { BasicInformationAllModel, BasicInformationModel, BudgetModel, OdDataset, OdGroup } from "./models";
 import { createHash } from "crypto";
+import { FetchHttpClient } from "../http";
 
 const BASEURL = "https://itdashboard.cio.go.jp/PublicApi/getData.json";
 const DEFAULT_EXPIRATION_TIME = 60000;
@@ -19,7 +20,13 @@ export interface Datasets {
   OdDataset: Partial<OdDataset>;
 }
 
-export type Options<Key extends keyof Datasets> = {
+export type ClientConfig = {
+  baseUrl?: string;
+  httpClient?: AxiosHttpClient | FetchHttpClient;
+  urlCacheDefaultExpirationTime?: number;
+};
+
+export type ApiOptions<Key extends keyof Datasets> = {
   fieldsToGet?: (keyof Datasets[Key])[];
   filterByFields?: Datasets[Key];
   option?: "count";
@@ -30,16 +37,20 @@ export class ItdashboardWebApiClient {
   private httpClient;
   private urlCache;
 
-  constructor(httpClient = new DefaultHttpClient(), baseUrl = BASEURL) {
+  constructor({
+    baseUrl = BASEURL,
+    httpClient = new DefaultHttpClient(),
+    urlCacheDefaultExpirationTime = DEFAULT_EXPIRATION_TIME,
+  }: ClientConfig = {}) {
     this.baseUrl = baseUrl;
     this.httpClient = httpClient;
-    this.urlCache = new UrlCache();
+    this.urlCache = new UrlCache(urlCacheDefaultExpirationTime);
   }
 
   async get<Key extends keyof Datasets>(
     dataset: Key,
-    options?: Options<Key>,
-    cacheExpirationTime?: number
+    options?: ApiOptions<Key>,
+    urlCacheExpirationTime?: number
   ): Promise<ApiResponse<Datasets[Key]>> {
     const queryParamsString = this.buildQueryString(dataset, options);
     const path = this.baseUrl + "?" + queryParamsString;
@@ -54,12 +65,12 @@ export class ItdashboardWebApiClient {
     const data = await this.httpClient.get(path);
 
     const cache = { data, ...{ takenFromCache: true } };
-    this.urlCache.add(path, cache, cacheExpirationTime);
+    this.urlCache.add(path, cache, urlCacheExpirationTime);
 
     return data;
   }
 
-  private buildQueryString<Key extends keyof Datasets>(dataset: Key, options?: Options<Key>) {
+  private buildQueryString<Key extends keyof Datasets>(dataset: Key, options?: ApiOptions<Key>) {
     const queryObject = {
       dataset: dataset,
     };
@@ -80,10 +91,14 @@ export class ItdashboardWebApiClient {
     const obj = new URLSearchParams(queryObject);
     return obj.toString();
   }
+
+  clearUrlCache() {
+    this.urlCache.clear();
+  }
 }
 
 class UrlCache {
-  private urlCache: { [aaa: string]: {}[] };
+  private urlCache: { [urlPath: string]: {}[] };
   private defaultExpirationTime;
 
   constructor(defaultExpirationTime: number = DEFAULT_EXPIRATION_TIME) {
@@ -111,11 +126,15 @@ class UrlCache {
 
   add(url: string, response: any, expirationTime?: number) {
     const hashKey = this.generateHashKey(url);
-    const time = expirationTime ? expirationTime : this.defaultExpirationTime;
+    const time = expirationTime !== undefined && !isNaN(expirationTime) ? expirationTime : this.defaultExpirationTime;
     const expiration = Date.now() + time;
 
     Object.assign(this.urlCache, {
       [hashKey]: [expiration, response],
     });
+  }
+
+  clear() {
+    this.urlCache = {};
   }
 }

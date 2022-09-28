@@ -15,12 +15,12 @@ const crypto_1 = require("crypto");
 const BASEURL = "https://itdashboard.cio.go.jp/PublicApi/getData.json";
 const DEFAULT_EXPIRATION_TIME = 60000;
 class ItdashboardWebApiClient {
-    constructor(httpClient = new AxiosClient_1.AxiosHttpClient(), baseUrl = BASEURL) {
+    constructor({ baseUrl = BASEURL, httpClient = new AxiosClient_1.AxiosHttpClient(), urlCacheDefaultExpirationTime = DEFAULT_EXPIRATION_TIME, } = {}) {
         this.baseUrl = baseUrl;
         this.httpClient = httpClient;
-        this.urlCache = new UrlCache();
+        this.urlCache = new UrlCache(urlCacheDefaultExpirationTime);
     }
-    get(dataset, options, cacheExpirationTime) {
+    get(dataset, options, urlCacheExpirationTime) {
         return __awaiter(this, void 0, void 0, function* () {
             const queryParamsString = this.buildQueryString(dataset, options);
             const path = this.baseUrl + "?" + queryParamsString;
@@ -31,7 +31,7 @@ class ItdashboardWebApiClient {
             }
             const data = yield this.httpClient.get(path);
             const cache = Object.assign({ data }, { takenFromCache: true });
-            this.urlCache.add(path, cache, cacheExpirationTime);
+            this.urlCache.add(path, cache, urlCacheExpirationTime);
             return data;
         });
     }
@@ -51,6 +51,9 @@ class ItdashboardWebApiClient {
         }
         const obj = new URLSearchParams(queryObject);
         return obj.toString();
+    }
+    clearUrlCache() {
+        this.urlCache.clear();
     }
 }
 exports.ItdashboardWebApiClient = ItdashboardWebApiClient;
@@ -78,11 +81,14 @@ class UrlCache {
     }
     add(url, response, expirationTime) {
         const hashKey = this.generateHashKey(url);
-        const time = expirationTime ? expirationTime : this.defaultExpirationTime;
+        const time = expirationTime !== undefined && !isNaN(expirationTime) ? expirationTime : this.defaultExpirationTime;
         const expiration = Date.now() + time;
         Object.assign(this.urlCache, {
             [hashKey]: [expiration, response],
         });
+    }
+    clear() {
+        this.urlCache = {};
     }
 }
 //# sourceMappingURL=ItdashboardWebApiClient.js.map

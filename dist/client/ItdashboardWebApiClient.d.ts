@@ -1,5 +1,6 @@
-import { AxiosHttpClient as DefaultHttpClient } from "../http/AxiosClient";
+import { AxiosHttpClient } from "../http/AxiosClient";
 import { BasicInformationAllModel, BasicInformationModel, BudgetModel, OdDataset, OdGroup } from "./models";
+import { FetchHttpClient } from "../http";
 export declare type ApiResponse<T> = {
     info: {
         api_verison: string;
@@ -15,7 +16,12 @@ export interface Datasets {
     OdGroup: Partial<OdGroup>;
     OdDataset: Partial<OdDataset>;
 }
-export declare type Options<Key extends keyof Datasets> = {
+export declare type ClientConfig = {
+    baseUrl?: string;
+    httpClient?: AxiosHttpClient | FetchHttpClient;
+    urlCacheDefaultExpirationTime?: number;
+};
+export declare type ApiOptions<Key extends keyof Datasets> = {
     fieldsToGet?: (keyof Datasets[Key])[];
     filterByFields?: Datasets[Key];
     option?: "count";
@@ -24,7 +30,8 @@ export declare class ItdashboardWebApiClient {
     private baseUrl;
     private httpClient;
     private urlCache;
-    constructor(httpClient?: DefaultHttpClient, baseUrl?: string);
-    get<Key extends keyof Datasets>(dataset: Key, options?: Options<Key>, cacheExpirationTime?: number): Promise<ApiResponse<Datasets[Key]>>;
+    constructor({ baseUrl, httpClient, urlCacheDefaultExpirationTime, }?: ClientConfig);
+    get<Key extends keyof Datasets>(dataset: Key, options?: ApiOptions<Key>, urlCacheExpirationTime?: number): Promise<ApiResponse<Datasets[Key]>>;
     private buildQueryString;
+    clearUrlCache(): void;
 }
