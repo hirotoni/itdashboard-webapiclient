@@ -3,7 +3,7 @@ import { FetchHttpClient } from "../../http";
 
 describe("Fetch Http Client", () => {
   const httpclient = new FetchHttpClient();
-  const client = new ItdashboardWebApiClient(httpclient);
+  const client = new ItdashboardWebApiClient({ httpClient: httpclient });
   test("should get something", async () => {
     const result = await client.get("BasicInformation");
     expect(result.info.dataset).toBe("基本情報");
@@ -11,11 +11,11 @@ describe("Fetch Http Client", () => {
 });
 
 describe("Axios Http Client", () => {
-  const client = new ItdashboardWebApiClient();
   jest.setTimeout(10000);
 
   describe("BasicInformationAll", () => {
     test("should get something", async () => {
+      const client = new ItdashboardWebApiClient();
       const result = await client.get("BasicInformationAll");
       expect(result.info.dataset).toBe("基本情報全項目");
       expect(result.raw_data).toBeTruthy();
@@ -24,12 +24,14 @@ describe("Axios Http Client", () => {
 
   describe("BasicInformation", () => {
     test("should get something", async () => {
+      const client = new ItdashboardWebApiClient();
       const result = await client.get("BasicInformation");
       expect(result.info.dataset).toBe("基本情報");
       expect(result.raw_data).toBeTruthy();
     });
 
     test("should get only year 2013 records", async () => {
+      const client = new ItdashboardWebApiClient();
       const result = await client.get("BasicInformation", {
         filterByFields: {
           year: 2013,
@@ -40,6 +42,7 @@ describe("Axios Http Client", () => {
     });
 
     test("should get only specified fields", async () => {
+      const client = new ItdashboardWebApiClient();
       const fieldsToGet = ["organization", "year"] as (keyof Datasets["BasicInformation"])[];
 
       const result = await client.get("BasicInformation", {
@@ -51,6 +54,7 @@ describe("Axios Http Client", () => {
     });
 
     test("should get only specified fields and only year 2013 combined", async () => {
+      const client = new ItdashboardWebApiClient();
       const fieldsToGet: (keyof Datasets["BasicInformation"])[] = ["organization", "year"];
       const filterByFields = { year: 2013 };
 
@@ -68,16 +72,18 @@ describe("Axios Http Client", () => {
 
   describe("OdGroup", () => {
     test("should get something", async () => {
+      const client = new ItdashboardWebApiClient();
       const result = await client.get("OdGroup");
       expect(result.raw_data).toBeTruthy();
     });
   });
 
   describe("OdDataset", () => {
-    test("should get from cache", async () => {
-      const expirationTime = 10000;
+    test("should get response from cache", async () => {
+      const client = new ItdashboardWebApiClient();
+      const EXPIRATION_TIME = 10000;
 
-      const resultToBeCached = await client.get("OdDataset", {}, expirationTime);
+      const resultToBeCached = await client.get("OdDataset", {}, EXPIRATION_TIME);
       expect(resultToBeCached.raw_data).toBeTruthy();
 
       const resultFromCache = await client.get("OdDataset");
@@ -86,7 +92,18 @@ describe("Axios Http Client", () => {
       setTimeout(async () => {
         const resultFromFresh = await client.get("OdDataset");
         expect(resultFromFresh.takenFromCache).toBe(undefined);
-      }, expirationTime);
+      }, EXPIRATION_TIME);
+    });
+
+    test("should get response without client-side cache", async () => {
+      const client = new ItdashboardWebApiClient();
+      const EXPIRATION_TIME = 0;
+
+      const resultToBeCached = await client.get("OdDataset", {}, EXPIRATION_TIME);
+      expect(resultToBeCached.raw_data).toBeTruthy();
+
+      const resultFromCache = await client.get("OdDataset");
+      expect(resultFromCache.takenFromCache).toBe(undefined);
     });
   });
 });
