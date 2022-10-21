@@ -1,7 +1,7 @@
 import { AxiosHttpClient, AxiosHttpClient as DefaultHttpClient } from "../http/AxiosClient";
-import { BasicInformationAllModel, BasicInformationModel, BudgetModel, OdDataset, OdGroup } from "./models";
 import { createHash } from "crypto";
 import { FetchHttpClient } from "../http";
+import { BasicInformationAll, BasicInformation, Budget, OdGroup, OdDataset } from "./models";
 
 const BASEURL = "https://itdashboard.cio.go.jp/PublicApi/getData.json";
 const DEFAULT_EXPIRATION_TIME = 60000;
@@ -13,9 +13,9 @@ export type ApiResponse<T> = {
 };
 
 export interface Datasets {
-  BasicInformationAll: Partial<BasicInformationAllModel>;
-  BasicInformation: Partial<BasicInformationModel>;
-  Budget: Partial<BudgetModel>;
+  BasicInformationAll: Partial<BasicInformationAll>;
+  BasicInformation: Partial<BasicInformation>;
+  Budget: Partial<Budget>;
   OdGroup: Partial<OdGroup>;
   OdDataset: Partial<OdDataset>;
 }
