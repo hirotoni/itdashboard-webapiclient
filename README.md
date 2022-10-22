@@ -6,9 +6,6 @@ Javascript/Typescript web api client module for the site below.
 
 # Available Datasets
 
-Checked ones are already available through this api client.
-Unchecked ones are to be implemented in the near future.
-
 情報システム全体
 
 - [x] BasicInformationAll
@@ -16,49 +13,49 @@ Unchecked ones are to be implemented in the near future.
 情報システム基本情報
 
 - [x] BasicInformation
-- [ ] SystemField
-- [ ] SystemArchitecture
-- [ ] OrganizationMaster
-- [ ] SystemClassMaster
-- [ ] SystemFieldMaster
-- [ ] SystemArchitectureMaster
+- [x] SystemField
+- [x] SystemArchitecture
+- [x] OrganizationMaster
+- [x] SystemClassMaster
+- [x] SystemFieldMaster
+- [x] SystemArchitectureMaster
 
 情報システム予算
 
 - [x] Budget
-- [ ] ReductionMaster
-- [ ] PfMaster
+- [x] ReductionMaster
+- [x] PfMaster
 
 オープンデータ
 
 - [x] OdGroup
 - [x] OdDataset
-- [ ] ResourceTotal
-- [ ] DataFormatTotal
-- [ ] LanguageTotal
-- [ ] TagRelation
-- [ ] GroupTypeMaster
-- [ ] FrequencyMaster
-- [ ] DataFormatMaster
-- [ ] LanguageMaster
-- [ ] OdAllTotal
+- [x] ResourceTotal
+- [x] DataFormatTotal
+- [x] LanguageTotal
+- [x] TagRelation
+- [x] GroupTypeMaster
+- [x] FrequencyMaster
+- [x] DataFormatMaster
+- [x] LanguageMaster
+- [x] OdAllTotal
 
 投資計画
 
-- [ ] InvestmentPlan
-- [ ] InvestmentByExpense
+- [x] InvestmentPlan
+- [x] InvestmentByExpense
 
 契約情報
 
-- [ ] BusinessInformation
-- [ ] BusinessSpending
-- [ ] BusinessBudget
+- [x] BusinessInformation
+- [x] BusinessSpending
+- [x] BusinessBudget
 
 運用コスト削減状況
 
-- [ ] CostReductionAllSystems
-- [ ] CostReduction5BillionSystems
-- [ ] CostReductionViewPoint
+- [x] CostReductionAllSystems
+- [x] CostReduction5BillionSystems
+- [x] CostReductionViewPoint
 
 # Features
 
@@ -66,7 +63,7 @@ Unchecked ones are to be implemented in the near future.
 
 # Features in the bucket list
 
-- Implement the interfaces of all of the above unchecked datasets.
+- Configurable http header
 
 # Installation
 
@@ -80,31 +77,30 @@ Unchecked ones are to be implemented in the near future.
 # Usage
 
 ```typescript
-import { ApiResponse, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
-import { BasicInformationModel } from "itdashboard-webapiclient/dist/client/models";
+import { ApiRequest, ApiResponse, ClientConfig, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
+import { FetchHttpClient } from "itdashboard-webapiclient/dist/http";
+import { BasicInformation } from "itdashboard-webapiclient/dist/client/models/BasicInformation";
+
+const EXPIRATION_TIME = 600000;
 
 // initialization
 const client = new ItdashboardWebApiClient();
-let resData: ApiResponse<BasicInformationModel>;
 
-// api call options
-const fieldsToGet: (keyof Datasets["BasicInformation"])[] = ["organization", "year"];
-const filterByFields = { year: 2013 };
-const cacheExpirationTime = 60000;
+// api request object
+const apiRequest: ApiRequest<"BasicInformationDatasets", "BasicInformation"> = {
+  datasetGroup: "BasicInformationDatasets",
+  dataset: "BasicInformation",
+  options: {
+    fieldsToGet: ["organization", "system_class", "system_name", "year"],
+    filterByFields: { year: 2013 },
+  },
+  urlCacheExpirationTime: EXPIRATION_TIME,
+};
 
 // api call
-client
-  .get(
-    "BasicInformation",
-    {
-      fieldsToGet,
-      filterByFields,
-    },
-    cacheExpirationTime
-  )
-  .then((d) => {
-    resData = d;
-  });
+client.get(apiRequest).then((data: ApiResponse<Partial<BasicInformation>>) => {
+  console.log(data);
+});
 ```
 
 ## Client-side Url Cache
@@ -123,6 +119,8 @@ const clientConfig: ClientConfig = { urlCacheDefaultExpirationTime: 0 };
 const client = new ItdashboardWebApiClient(clientConfig);
 
 // disabling caching on each request
-const cacheExpirationTime = 0;
-client.get("BasicInformation", {}, cacheExpirationTime);
+client.get({
+  ...
+  urlCacheExpirationTime: 0
+});
 ```
