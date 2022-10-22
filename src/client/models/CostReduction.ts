@@ -1,7 +1,7 @@
 /** 運用コスト削減状況：運用コスト削減状況（全体） */
 export interface CostReductionAllSystems {
   /** 年（西暦） */
-  year: string;
+  year: number;
   /** 情報システム名 */
   system_name: string;
   /** 組織名 */
