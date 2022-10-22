@@ -107,9 +107,9 @@ client.get(apiRequest).then((data: ApiResponse<Partial<BasicInformation>>) => {
 
 In order to lower the frequency of sending request to the server, in-memory url cache is implemented on this api client. Default cache expiration time is 60000 milliseconds.
 
-Url cache is tied with each api client instance, which means that in the environment where this api client runs on multiple processes/threads or on browsers, caching works on each individual instances separately.
+Url cache is tied with each api client instance, which means that in the environment where multi-processes, multi-threads or on browsers, caching works on each individual instances separately.
 
-This might raise the complexity of your applications in cache-wise. In React, for example, you can build your own cache of api responses within the react contexts by using States, Contexts, Memos and etc...
+This might raise the complexity of your applications in cache-wise. In React, for example, you can build your own cache implementation using React States, Contexts, Memos and etc...
 
 In that case, you can disable caching of this api client by providing config with 0 millisecond at initialization, or on each request.
 
