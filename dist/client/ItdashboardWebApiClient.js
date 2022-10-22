@@ -11,18 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItdashboardWebApiClient = void 0;
 const AxiosClient_1 = require("../http/AxiosClient");
-const crypto_1 = require("crypto");
+const UrlCache_1 = require("./UrlCache");
 const BASEURL = "https://itdashboard.cio.go.jp/PublicApi/getData.json";
-const DEFAULT_EXPIRATION_TIME = 60000;
 class ItdashboardWebApiClient {
-    constructor({ baseUrl = BASEURL, httpClient = new AxiosClient_1.AxiosHttpClient(), urlCacheDefaultExpirationTime = DEFAULT_EXPIRATION_TIME, } = {}) {
+    constructor({ baseUrl = BASEURL, httpClient = new AxiosClient_1.AxiosHttpClient(), urlCacheDefaultExpirationTime = UrlCache_1.DEFAULT_EXPIRATION_TIME, } = {}) {
         this.baseUrl = baseUrl;
         this.httpClient = httpClient;
-        this.urlCache = new UrlCache(urlCacheDefaultExpirationTime);
+        this.urlCache = new UrlCache_1.UrlCache(urlCacheDefaultExpirationTime);
     }
-    get(dataset, options, urlCacheExpirationTime) {
+    get(apiRequest) {
         return __awaiter(this, void 0, void 0, function* () {
-            const queryParamsString = this.buildQueryString(dataset, options);
+            const queryParamsString = this.buildQueryString(apiRequest.dataset, apiRequest.options);
             const path = this.baseUrl + "?" + queryParamsString;
             const cachedData = this.urlCache.get(path);
             if (cachedData) {
@@ -30,16 +29,13 @@ class ItdashboardWebApiClient {
                 return cachedData;
             }
             const data = yield this.httpClient.get(path);
-            const cache = Object.assign({ data }, { takenFromCache: true });
-            this.urlCache.add(path, cache, urlCacheExpirationTime);
+            this.urlCache.add(path, data, apiRequest.urlCacheExpirationTime);
             return data;
         });
     }
     buildQueryString(dataset, options) {
         var _a;
-        const queryObject = {
-            dataset: dataset,
-        };
+        const queryObject = { dataset: dataset };
         if (options === null || options === void 0 ? void 0 : options.fieldsToGet) {
             const fieldsToGet = (_a = options.fieldsToGet) === null || _a === void 0 ? void 0 : _a.join(",");
             Object.assign(queryObject, {
@@ -57,38 +53,4 @@ class ItdashboardWebApiClient {
     }
 }
 exports.ItdashboardWebApiClient = ItdashboardWebApiClient;
-class UrlCache {
-    constructor(defaultExpirationTime = DEFAULT_EXPIRATION_TIME) {
-        this.urlCache = {};
-        this.defaultExpirationTime = defaultExpirationTime;
-    }
-    generateHashKey(url) {
-        const hash = (0, crypto_1.createHash)("md5").update(url).digest("hex");
-        return hash;
-    }
-    get(url) {
-        const hashKey = this.generateHashKey(url);
-        const value = this.urlCache[hashKey];
-        if (value) {
-            if (Date.now() < value[0]) {
-                return value[1];
-            }
-            else {
-                delete this.urlCache[hashKey];
-            }
-        }
-        return;
-    }
-    add(url, response, expirationTime) {
-        const hashKey = this.generateHashKey(url);
-        const time = expirationTime !== undefined && !isNaN(expirationTime) ? expirationTime : this.defaultExpirationTime;
-        const expiration = Date.now() + time;
-        Object.assign(this.urlCache, {
-            [hashKey]: [expiration, response],
-        });
-    }
-    clear() {
-        this.urlCache = {};
-    }
-}
 //# sourceMappingURL=ItdashboardWebApiClient.js.map

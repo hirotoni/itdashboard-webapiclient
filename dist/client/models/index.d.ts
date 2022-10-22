@@ -1,65 +1,61 @@
-export interface BasicInformationAllModel {
-    system_id: string;
-    system_name: string;
-    system_class_code: string;
-    system_class: string;
-    organization_code: string;
-    organization: string;
-    system_field_code: string;
-    system_field: string;
-    architecture_code: string;
-    architecture: string;
-    reduction_code: string;
-    reduction: string;
-    pf_code: string;
-    pf: string;
-    year: string;
+import { BasicInformation, OrganizationMaster, SystemArchitecture, SystemArchitectureMaster, SystemClassMaster, SystemField, SystemFieldMaster } from "./BasicInformation";
+import { BasicInformationAll } from "./BasicInformationAll";
+import { Budget, PfMaster, ReductionMaster } from "./Budget";
+import { BusinessBudget, BusinessInformation, BusinessSpending } from "./BusinessInformation";
+import { CostReduction5BillionSystems, CostReductionAllSystems, CostReductionViewPoint } from "./CostReduction";
+import { InvestmentByExpense, InvestmentPlan } from "./InvestmentPlan";
+import { DataFormatMaster, DataFormatTotal, FrequencyMaster, GroupTypeMaster, LanguageMaster, LanguageTotal, OdAllTotal, OdDataset, OdGroup, ResourceTotal, TagRelation } from "./OpenData";
+interface BasicInformationAllDatasets {
+    BasicInformationAll: Partial<BasicInformationAll>;
 }
-export interface BasicInformationModel {
-    system_id: string;
-    system_name: string;
-    system_class_code: string;
-    system_class: string;
-    organization_code: string;
-    organization: string;
-    year: number;
+interface BasicInformationDatasets {
+    BasicInformation: Partial<BasicInformation>;
+    SystemField: Partial<SystemField>;
+    SystemArchitecture: Partial<SystemArchitecture>;
+    OrganizationMaster: Partial<OrganizationMaster>;
+    SystemClassMaster: Partial<SystemClassMaster>;
+    SystemFieldMaster: Partial<SystemFieldMaster>;
+    SystemArchitectureMaster: Partial<SystemArchitectureMaster>;
 }
-export interface BudgetModel {
-    system_id: string;
-    system_name: string;
-    system_class_code: string;
-    system_class: string;
-    organization_code: string;
-    organization: string;
-    year: string;
-    reduction_code: string;
-    reduction: string;
-    pf_code: string;
-    pf: string;
-    operating_budget: string;
-    development_budget: string;
-    sum_budget: string;
+interface BudgetDatasets {
+    Budget: Partial<Budget>;
+    ReductionMaster: Partial<ReductionMaster>;
+    PfMaster: Partial<PfMaster>;
 }
-export interface OdGroup {
-    opendata_id: number;
-    group_title: string;
-    group_name: string;
-    description: string;
-    group_type_code: string;
-    group_type: string;
-    year: number;
+interface BusinessInformationDatasets {
+    BusinessInformation: Partial<BusinessInformation>;
+    BusinessSpending: Partial<BusinessSpending>;
+    BusinessBudget: Partial<BusinessBudget>;
 }
-export interface OdDataset {
-    opendata_id: number;
-    dataset_id: number;
-    dataset_title: string;
-    dataset_name: string;
-    organization_code: string;
-    organization: string;
-    publisher: string;
-    author: string;
-    frequency_code: string;
-    frequency: string;
-    description: string;
-    release_day: string;
+interface InvestmentPlanDatasets {
+    InvestmentPlan: Partial<InvestmentPlan>;
+    InvestmentByExpense: Partial<InvestmentByExpense>;
 }
+interface CostReductionDatasets {
+    CostReductionAllSystems: Partial<CostReductionAllSystems>;
+    CostReduction5BillionSystems: Partial<CostReduction5BillionSystems>;
+    CostReductionViewPoint: Partial<CostReductionViewPoint>;
+}
+interface OpenDataDatasets {
+    OdGroup: Partial<OdGroup>;
+    OdDataset: Partial<OdDataset>;
+    ResourceTotal: Partial<ResourceTotal>;
+    DataFormatTotal: Partial<DataFormatTotal>;
+    LanguageTotal: Partial<LanguageTotal>;
+    TagRelation: Partial<TagRelation>;
+    GroupTypeMaster: Partial<GroupTypeMaster>;
+    FrequencyMaster: Partial<FrequencyMaster>;
+    DataFormatMaster: Partial<DataFormatMaster>;
+    LanguageMaster: Partial<LanguageMaster>;
+    OdAllTotal: Partial<OdAllTotal>;
+}
+export interface Datasets {
+    BasicInformationAllDatasets: BasicInformationAllDatasets;
+    BasicInformationDatasets: BasicInformationDatasets;
+    BudgetDatasets: BudgetDatasets;
+    BusinessInformationDatasets: BusinessInformationDatasets;
+    InvestmentPlanDatasets: InvestmentPlanDatasets;
+    CostReductionDatasets: CostReductionDatasets;
+    OpenDataDatasets: OpenDataDatasets;
+}
+export {};

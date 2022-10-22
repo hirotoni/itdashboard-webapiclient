@@ -1,24 +1,9 @@
 import { AxiosHttpClient, AxiosHttpClient as DefaultHttpClient } from "../http/AxiosClient";
-import { createHash } from "crypto";
 import { FetchHttpClient } from "../http";
-import { BasicInformationAll, BasicInformation, Budget, OdGroup, OdDataset } from "./models";
+import { Datasets } from "./models";
+import { DEFAULT_EXPIRATION_TIME, UrlCache } from "./UrlCache";
 
 const BASEURL = "https://itdashboard.cio.go.jp/PublicApi/getData.json";
-const DEFAULT_EXPIRATION_TIME = 60000;
-
-export type ApiResponse<T> = {
-  info: { api_verison: string; dataset: string };
-  raw_data: T[];
-  takenFromCache?: boolean;
-};
-
-export interface Datasets {
-  BasicInformationAll: Partial<BasicInformationAll>;
-  BasicInformation: Partial<BasicInformation>;
-  Budget: Partial<Budget>;
-  OdGroup: Partial<OdGroup>;
-  OdDataset: Partial<OdDataset>;
-}
 
 export type ClientConfig = {
   baseUrl?: string;
@@ -26,10 +11,24 @@ export type ClientConfig = {
   urlCacheDefaultExpirationTime?: number;
 };
 
-export type ApiOptions<Key extends keyof Datasets> = {
-  fieldsToGet?: (keyof Datasets[Key])[];
-  filterByFields?: Datasets[Key];
-  option?: "count";
+export type ApiRequest<K extends keyof Datasets, V extends keyof Datasets[K]> = {
+  datasetGroup: K;
+  dataset: V;
+  options?: ApiOptions<K, V>;
+  urlCacheExpirationTime?: number;
+  headers?: {};
+};
+
+export type ApiOptions<K extends keyof Datasets, V extends keyof Datasets[K]> = {
+  fieldsToGet?: (keyof Datasets[K][V])[];
+  filterByFields?: Datasets[K][V];
+  option?: "count" | undefined;
+};
+
+export type ApiResponse<T> = {
+  info: { api_verison: string; dataset: string };
+  raw_data: T[];
+  takenFromCache?: boolean;
 };
 
 export class ItdashboardWebApiClient {
@@ -47,33 +46,27 @@ export class ItdashboardWebApiClient {
     this.urlCache = new UrlCache(urlCacheDefaultExpirationTime);
   }
 
-  async get<Key extends keyof Datasets>(
-    dataset: Key,
-    options?: ApiOptions<Key>,
-    urlCacheExpirationTime?: number
-  ): Promise<ApiResponse<Datasets[Key]>> {
-    const queryParamsString = this.buildQueryString(dataset, options);
+  async get<K extends keyof Datasets, V extends keyof Datasets[K]>(
+    apiRequest: ApiRequest<K, V>
+  ): Promise<ApiResponse<Datasets[K][V]>> {
+    const queryParamsString = this.buildQueryString(apiRequest.dataset, apiRequest.options);
     const path = this.baseUrl + "?" + queryParamsString;
-
     const cachedData = this.urlCache.get(path);
-
     if (cachedData) {
       console.log("returning cached result: ", cachedData);
-      return cachedData as ApiResponse<Datasets[Key]>;
+      return cachedData as ApiResponse<Datasets[K][V]>;
     }
-
     const data = await this.httpClient.get(path);
-
-    const cache = { data, ...{ takenFromCache: true } };
-    this.urlCache.add(path, cache, urlCacheExpirationTime);
+    this.urlCache.add(path, data, apiRequest.urlCacheExpirationTime);
 
     return data;
   }
 
-  private buildQueryString<Key extends keyof Datasets>(dataset: Key, options?: ApiOptions<Key>) {
-    const queryObject = {
-      dataset: dataset,
-    };
+  private buildQueryString<K extends keyof Datasets, V extends keyof Datasets[K]>(
+    dataset: V,
+    options?: ApiOptions<K, V>
+  ) {
+    const queryObject = { dataset: dataset as string };
 
     if (options?.fieldsToGet) {
       const fieldsToGet = options.fieldsToGet?.join(",");
@@ -81,7 +74,6 @@ export class ItdashboardWebApiClient {
         field: fieldsToGet,
       });
     }
-
     if (options?.filterByFields) {
       Object.assign(queryObject, {
         ...options.filterByFields,
@@ -94,47 +86,5 @@ export class ItdashboardWebApiClient {
 
   clearUrlCache() {
     this.urlCache.clear();
-  }
-}
-
-class UrlCache {
-  private urlCache: { [urlPath: string]: {}[] };
-  private defaultExpirationTime;
-
-  constructor(defaultExpirationTime: number = DEFAULT_EXPIRATION_TIME) {
-    this.urlCache = {};
-    this.defaultExpirationTime = defaultExpirationTime;
-  }
-
-  private generateHashKey(url: string) {
-    const hash = createHash("md5").update(url).digest("hex");
-    return hash;
-  }
-
-  get(url: string) {
-    const hashKey = this.generateHashKey(url);
-    const value = this.urlCache[hashKey];
-    if (value) {
-      if (Date.now() < value[0]) {
-        return value[1];
-      } else {
-        delete this.urlCache[hashKey];
-      }
-    }
-    return;
-  }
-
-  add(url: string, response: any, expirationTime?: number) {
-    const hashKey = this.generateHashKey(url);
-    const time = expirationTime !== undefined && !isNaN(expirationTime) ? expirationTime : this.defaultExpirationTime;
-    const expiration = Date.now() + time;
-
-    Object.assign(this.urlCache, {
-      [hashKey]: [expiration, response],
-    });
-  }
-
-  clear() {
-    this.urlCache = {};
   }
 }
