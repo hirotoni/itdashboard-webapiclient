@@ -77,8 +77,7 @@ Javascript/Typescript web api client module for the site below.
 # Usage
 
 ```typescript
-import { ApiRequest, ApiResponse, ClientConfig, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
-import { FetchHttpClient } from "itdashboard-webapiclient/dist/http";
+import { ApiRequest, ApiResponse, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
 import { BasicInformation } from "itdashboard-webapiclient/dist/client/models/BasicInformation";
 
 const EXPIRATION_TIME = 600000;
@@ -115,6 +114,8 @@ In that case, you can disable caching of this api client by providing config wit
 
 ```ts
 // disabling caching at initialization
+import { ClientConfig } from "itdashboard-webapiclient/dist";
+
 const clientConfig: ClientConfig = { urlCacheDefaultExpirationTime: 0 };
 const client = new ItdashboardWebApiClient(clientConfig);
 
