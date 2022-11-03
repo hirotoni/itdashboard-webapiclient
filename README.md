@@ -63,15 +63,26 @@ Javascript/Typescript web api client module for the site below.
 
 # Features in the bucket list
 
+- Return http status code
 - Configurable http header
+- Configurable client-side timeout
 
 # Installation
 
+I've not yet published this package on npm because I'm developing this for personal learning process. If you want to try this package,
+ install directry from github repository and import modules from directories underneath `dist/`.
+
+In your package.json:
 ```json
 "dependencies": {
     // the package name could be anything for now.
-    "itdashboard-webapiclient": "https://github.com/hirotoni/itdashboard-webapiclient.git#master",
+    "itdashboard-webapiclient": "https://github.com/hirotoni/itdashboard-webapiclient-typescript.git#master",
 },
+```
+
+In your script:
+```typescript
+import { ApiRequest, ApiResponse, ItdashboardWebApiClient } from "itdashboard-webapiclient/dist";
 ```
 
 # Usage
